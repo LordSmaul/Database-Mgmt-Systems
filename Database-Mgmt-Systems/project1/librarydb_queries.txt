@@ -1,0 +1,57 @@
+1. Pairs of people (their card numbers, first names and last names) with the same phone number, with no repetition.
+Ex1. If Ben Smith with card number 1 has the same phone number as Keith Smith with card number 2, then the following tuple should be in the result of the query:
+[1 | Ben | Smith | 2 | Keith | Smith] (or [2 | Keith | Smith | 1 | Ben | Smith])
+Tuple [2 | Keith | Smith | 1 | Ben | Smith] should not appear in the result of the query if the above tuple is in the result, as that would denote repetition of information.
+Tuple [1 | Keith | Smith | 1 | Keith | Smith] should not appear in the result of the query as it means that member with card number 1 has the same phone number as member with phone number 1, which is obvious.
+Ex2. If Ben Smith with card number 1 and Grace Smith with card number 3 have the same phone number as Keith Smith with card number 2, then the following tuples should be in the result of the query:
+[1 | Ben | Smith | 2 | Keith | Smith] (or [2 | Keith | Smith | 1 | Ben | Smith])
+[1 | Ben | Smith | 3 | Grace | Smith] (or [3 | Grace | Smith | 1 | Ben | Smith])
+[3 | Grace | Smith | 2 | Keith | Smith] (or [2 | Keith | Smith | 3 | Grace | Smith])
+--------------------------------
+πm1.card_no, m1.first_name, m1.last_name, m2.card_no, m2.first_name, m2.last_name (σm1.phone_no = m2.phone_no ∧ m1.first_name != m2.first_name ∧ m1.card_no > m2.card_no (ρm1 MEMBER ⨯ ρm2 MEMBER))
+________________________________
+
+2. Members (their card numbers, first, middle and last names) who hold a book longer than 2 weeks, along with the date they borrowed the book.
+--------------------------------
+πcard_no, first_name, middle_name, last_name, date_borrowed (σ(DAY(date_returned) - DAY(date_borrowed) > 14) (BORROW ⨝ MEMBER))
+________________________________
+
+3. Members (their card numbers, first, middle and last names) who didn't ever borrow any book.
+--------------------------------
+πcard_no, first_name, middle_name, last_name (MEMBER ▷ BORROW)
+________________________________
+
+4. ISBNs and titles of books borrowed on 22/9/3.
+--------------------------------
+πISBN, title σdate_borrowed = date('2022-09-03') (BOOK ⨝ COPY ⨝ BORROW)
+________________________________
+
+5. Genres.
+--------------------------------
+πgenre (BOOK)
+________________________________
+6. ISBNs and titles of books that have more than one author.
+--------------------------------
+πba1.ISBN, ba2.title (σba1.ISBN = ba2.ISBN ∧ ba1.author_id != ba2.author_id (ρba1 BOOK_AUTHOR ⨯ ρba2 (BOOK_AUTHOR ⨝ BOOK)))
+________________________________
+
+7. ISBN(s) and title(s) of all books written by Thomas Connolly(s), if any.
+--------------------------------
+πISBN, title σfirst_name = 'Thomas' ∧ last_name = 'Connolly' (BOOK ⨝ BOOK_AUTHOR ⨝ AUTHOR)
+________________________________
+
+8. ISBN(s) and title(s) of all books borrowed by member 331, if any.
+--------------------------------
+πISBN, title σcard_no = 331 (BOOK ⨝ COPY ⨝ BORROW)
+________________________________
+
+9. Member(s) (their card number) who renewed a book twice and still didn't return it, if any.
+--------------------------------
+πcard_no σdate_returned = null ∧ renewals_no = 2 (BORROW)
+________________________________
+
+10. Book(s) (their ISBN(s) and title(s)) with the highest edition.
+If there is a book with edition 9th, and no other book has a higher edition in the Libary database, then that book should be returned in the result (it's ISBN and title, to be specific).
+--------------------------------
+πb1.ISBN, b1.title (σ(b1.title != b2.title ∧ b1.edition > b2.edition) (ρb1 BOOK ⨯ ρb2 BOOK))
+________________________________
