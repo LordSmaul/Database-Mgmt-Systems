@@ -1,4 +1,3 @@
-package CSC3300.project3;
 
 import java.util.*;
 import java.sql.*;
